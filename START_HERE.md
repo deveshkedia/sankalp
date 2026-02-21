@@ -117,7 +117,7 @@ sanklap/
 | `localhost:3000/admin/setup`     | Configure event               | Admin password |
 | `localhost:3000/admin/dashboard` | View submissions              | Admin password |
 
-**Default admin password**: `admin123` (CHANGE THIS BEFORE LAUNCH!)
+**Default admin password**: Changed during setup (contact organizer)
 
 ---
 
@@ -179,7 +179,7 @@ Any Node.js 20+ compatible host works (AWS, Railway, Render, etc.).
 1. **Change Admin Password** (before launch!)
    - `/app/admin/setup/page.tsx` - Line ~35
    - `/app/admin/dashboard/page.tsx` - Line ~52
-   - Change `'admin123'` to your password
+   - Change admin password in code before deployment
 
 2. **Keep .env.local Private**
    - It's in `.gitignore` (don't accidentally commit it!)
@@ -199,7 +199,7 @@ Any Node.js 20+ compatible host works (AWS, Railway, Render, etc.).
 | "Node version error"    | Upgrade to Node 20+: `nvm install 20`             |
 | "Can't lock sectors"    | Admin hasn't added sectors yet (/admin/setup)     |
 | Submissions not showing | Go to admin → Dashboard → Click Refresh           |
-| Admin password wrong    | Default is `admin123`, check if you changed it    |
+| Admin password wrong    | Check with event organizer for credentials        |
 
 See `CHECKLIST.md` for more help.
 

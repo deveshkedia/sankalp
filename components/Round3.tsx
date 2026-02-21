@@ -108,7 +108,7 @@ export function Round3({ teamName, onComplete }: Round3Props) {
       <div className="min-h-screen bg-gradient-to-br from-orange-600 to-red-600 p-4">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-lg shadow-xl p-8">
-            <h1 className="text-3xl font-bold mb-2">Sanklap Event - Round 3</h1>
+            <h1 className="text-3xl font-bold mb-2">AD-RENALINE - Round 3</h1>
             <p className="text-gray-600 mb-8">
               Team: <span className="font-semibold">{teamName}</span>
             </p>

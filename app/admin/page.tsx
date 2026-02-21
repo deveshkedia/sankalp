@@ -8,7 +8,7 @@ export default function AdminHome() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4">
       <div className="max-w-2xl mx-auto">
         <div className="mb-12">
-          <h1 className="text-4xl font-bold text-white mb-2">Sanklap Admin</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">AD-RENALINE Admin</h1>
           <p className="text-slate-300">Event management and analytics</p>
         </div>
 

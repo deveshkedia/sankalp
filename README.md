@@ -104,8 +104,8 @@ Visit `http://localhost:3000` in your browser.
 
 - **Event Link (for participants)**: `http://localhost:3000/`
 - **Admin Home**: `http://localhost:3000/admin`
-- **Admin Setup**: `http://localhost:3000/admin/setup` (password: `admin123`)
-- **Admin Dashboard**: `http://localhost:3000/admin/dashboard` (password: `admin123`)
+- **Admin Setup**: `http://localhost:3000/admin/setup` (password: secure)
+- **Admin Dashboard**: `http://localhost:3000/admin/dashboard` (password: secure)
 
 ## Event Flow
 
@@ -132,7 +132,7 @@ Visit `http://localhost:3000` in your browser.
 
 ## Admin Setup Walkthrough
 
-1. Login to Admin Setup (`/admin/setup`) with password `admin123`
+1. Login to Admin Setup (`/admin/setup`) with your admin password
 2. Add all 10 sectors with:
    - **Name**: e.g., "Healthcare"
    - **Situation**: Business scenario description

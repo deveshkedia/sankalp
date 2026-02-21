@@ -106,7 +106,7 @@ export function Round1({ teamName, onComplete }: Round1Props) {
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">
-              Sanklap Event - Round 1
+              AD-RENALINE - Round 1
             </h1>
             <p className="text-blue-100">Welcome, {teamName}!</p>
             <p className="text-blue-100">Select your sector</p>

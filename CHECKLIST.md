@@ -173,7 +173,7 @@ All except Team Link require the admin password.
 | "Team not found" error  | Verify team name spelled correctly                                |
 | Submissions not showing | Refresh admin dashboard or check database directly                |
 | Sector passwords wrong  | Go to admin setup and edit sector password                        |
-| Admin login fails       | Password is case-sensitive, default is `admin123`                 |
+| Admin login fails       | Use correct admin password (not public)                           |
 | Site is slow            | Check Supabase database isn't rate limited (free tier has limits) |
 
 ---

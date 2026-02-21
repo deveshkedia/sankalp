@@ -34,9 +34,9 @@ export default function AdminSetup() {
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault()
     // Simple password check - in production use proper auth
-    if (password === "admin123") {
+    if (password === "ADRen@2026!Sec") {
       setIsAuthenticated(true)
-      setAdminPassword("admin123")
+      setAdminPassword("ADRen@2026!Sec")
     } else {
       alert("Incorrect password")
     }
@@ -142,7 +142,7 @@ export default function AdminSetup() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               />
               <p className="text-xs text-gray-500 mt-2">
-                Demo password: admin123
+                Secure admin password required
               </p>
             </div>
 

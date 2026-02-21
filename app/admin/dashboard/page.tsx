@@ -41,7 +41,7 @@ export default function AdminDashboard() {
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault()
-    if (password === "admin123") {
+    if (password === "ADRen@2026!Sec") {
       setIsAuthenticated(true)
     } else {
       alert("Incorrect password")
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               />
               <p className="text-xs text-gray-500 mt-2">
-                Demo password: admin123
+                Secure admin password required
               </p>
             </div>
 
