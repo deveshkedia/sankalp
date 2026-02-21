@@ -33,8 +33,8 @@ export function TeamNameInput({
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-        <h1 className="text-3xl font-bold text-center mb-2">AD-RENALINE</h1>
-        <p className="text-center text-gray-600 mb-8">
+        <h1 className="text-3xl font-bold text-center mb-2 text-red-600">AD-RENALINE</h1>
+        <p className="text-center text-red-500 mb-8 font-semibold">
           Round 1: Team Registration
         </p>
 
