@@ -293,11 +293,13 @@ export default function AdminDashboard() {
                                 <div className="mt-2 text-xs bg-gray-100 p-2 rounded">
                                   {Object.entries(
                                     submission.data.allocations || {},
-                                  ).map(([channel, amount]) => (
-                                    <div key={channel}>
-                                      {channel}: {amount}
-                                    </div>
-                                  ))}
+                                  ).map(
+                                    ([channel, amount]: [string, unknown]) => (
+                                      <div key={channel}>
+                                        {channel}: {String(amount)}
+                                      </div>
+                                    ),
+                                  )}
                                 </div>
                               </details>
                             </>
