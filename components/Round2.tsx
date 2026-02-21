@@ -42,6 +42,7 @@ export function Round2({ teamName, onComplete }: Round2Props) {
         <div className="bg-white rounded-lg shadow-xl p-8">
           <h1 className="text-3xl font-bold mb-2 text-purple-600">AD-RENALINE - Round 2</h1>
           <p className="text-lg text-purple-500 font-semibold mb-8">Share Your Innovation</p>
+          <p className="text-gray-600 mb-4">
             Team: <span className="font-semibold">{teamName}</span>
           </p>
 
