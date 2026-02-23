@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import { Lock, Check } from "lucide-react"
+import { MarketEventCards } from "./MarketEventCards"
 
 interface Round3Props {
   teamName: string
@@ -22,7 +23,7 @@ interface Sector {
   password: string
 }
 
-type Round3Stage = "allocation" | "sector" | "choice" | "complete"
+type Round3Stage = "allocation" | "sector" | "choice" | "marketEvent" | "complete"
 
 export function Round3({ teamName, onComplete }: Round3Props) {
   const [stage, setStage] = useState<Round3Stage>("allocation")
@@ -348,7 +349,8 @@ export function Round3({ teamName, onComplete }: Round3Props) {
             onClick={async () => {
               setSubmitting(true)
               try {
-                await onComplete(selectedSector!.id, selectedChoice!)
+                // Show market events before completing
+                setStage("marketEvent")
               } finally {
                 setSubmitting(false)
               }
@@ -356,7 +358,7 @@ export function Round3({ teamName, onComplete }: Round3Props) {
             disabled={submitting}
             className="w-full bg-orange-600 text-white py-3 rounded-lg font-bold hover:bg-orange-700 transition disabled:opacity-50"
           >
-            {submitting ? "Submitting..." : "Submit & Complete"}
+            {submitting ? "Submitting..." : "Submit & View Market Events"}
           </button>
 
           <button
@@ -368,6 +370,23 @@ export function Round3({ teamName, onComplete }: Round3Props) {
           </button>
         </div>
       </div>
+    )
+  }
+
+  // Stage 5: Market Events
+  if (stage === "marketEvent" && selectedChoice) {
+    return (
+      <MarketEventCards
+        choice={selectedChoice}
+        onContinue={async () => {
+          setSubmitting(true)
+          try {
+            await onComplete(selectedSector!.id, selectedChoice!)
+          } finally {
+            setSubmitting(false)
+          }
+        }}
+      />
     )
   }
 

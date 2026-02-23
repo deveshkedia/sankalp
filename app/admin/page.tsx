@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Settings, BarChart3, Home } from "lucide-react"
+import { Settings, BarChart3, Home, Coins } from "lucide-react"
 
 export default function AdminHome() {
   return (
@@ -12,7 +12,7 @@ export default function AdminHome() {
           <p className="text-slate-300">Event management and analytics</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Setup */}
           <Link href="/admin/setup">
             <div className="bg-white rounded-lg shadow-lg p-8 cursor-pointer hover:shadow-xl transition transform hover:-translate-y-1">
@@ -37,6 +37,21 @@ export default function AdminHome() {
               </h2>
               <p className="text-gray-600">
                 View live submissions and team progress
+              </p>
+            </div>
+          </Link>
+
+          {/* Allocations */}
+          <Link href="/admin/allocations">
+            <div className="bg-white rounded-lg shadow-lg p-8 cursor-pointer hover:shadow-xl transition transform hover:-translate-y-1">
+              <div className="mb-4">
+                <Coins className="w-12 h-12 text-purple-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Terra Coins
+              </h2>
+              <p className="text-gray-600">
+                View team coin allocations
               </p>
             </div>
           </Link>

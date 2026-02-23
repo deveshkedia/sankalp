@@ -6,8 +6,108 @@ import { TeamNameInput } from "@/components/TeamNameInput"
 import { Round1 } from "@/components/Round1"
 import { Round2 } from "@/components/Round2"
 import { Round3 } from "@/components/Round3"
+import { Lock } from "lucide-react"
 
-type AppState = "teamName" | "round1" | "round2" | "round3" | "complete"
+type AppState = "teamName" | "round1Password" | "round1" | "round2Password" | "round2" | "round3Password" | "round3" | "complete"
+
+// Round Password Screen Component
+interface RoundPasswordScreenProps {
+  round: 1 | 2 | 3
+  teamName: string
+  onPasswordCorrect: () => void
+}
+
+function RoundPasswordScreen({ round, teamName, onPasswordCorrect }: RoundPasswordScreenProps) {
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [submitting, setSubmitting] = useState(false)
+
+  const roundPasswords: Record<1 | 2 | 3, string> = {
+    1: "round1pass",
+    2: "round2pass",
+    3: "round3pass",
+  }
+
+  const correctPassword = roundPasswords[round]
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+
+    if (password === correctPassword) {
+      setSubmitting(true)
+      await new Promise((resolve) => setTimeout(resolve, 300))
+      onPasswordCorrect()
+    } else {
+      setError("Incorrect password. Please try again.")
+      setPassword("")
+    }
+  }
+
+  const colors: Record<1 | 2 | 3, string> = {
+    1: "from-blue-600 to-purple-600",
+    2: "from-green-600 to-emerald-600",
+    3: "from-orange-600 to-red-600",
+  }
+
+  const titleColors: Record<1 | 2 | 3, string> = {
+    1: "text-blue-600",
+    2: "text-green-600",
+    3: "text-orange-600",
+  }
+
+  const buttonColors: Record<1 | 2 | 3, string> = {
+    1: "bg-blue-600 hover:bg-blue-700",
+    2: "bg-green-600 hover:bg-green-700",
+    3: "bg-orange-600 hover:bg-orange-700",
+  }
+
+  return (
+    <div className={`min-h-screen bg-gradient-to-br ${colors[round]} p-4 flex items-center justify-center`}>
+      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+        <div className="text-center mb-8">
+          <Lock className={`w-12 h-12 ${titleColors[round]} mx-auto mb-4`} />
+          <h1 className={`text-3xl font-bold mb-2 ${titleColors[round]}`}>
+            Round {round}
+          </h1>
+          <p className="text-gray-600">Enter the password to proceed</p>
+          <p className="text-gray-500 text-sm mt-2">Team: {teamName}</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Round {round} Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              disabled={submitting}
+              autoFocus
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded text-sm">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className={`w-full py-2 rounded-lg font-medium text-white transition ${buttonColors[round]} disabled:opacity-50`}
+          >
+            {submitting ? "Verifying..." : "Unlock Round"}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
 
 interface TeamSession {
   team_name: string
@@ -54,14 +154,14 @@ export default function Home() {
       if (data) {
         setTeamSession(data)
         const roundMap: Record<number, AppState> = {
-          1: "round1",
-          2: "round2",
-          3: "round3",
+          1: "round1Password",
+          2: "round2Password",
+          3: "round3Password",
           4: "complete",
         }
         setState(roundMap[data.current_round] || "teamName")
       } else {
-        setState("round1")
+        setState("round1Password")
       }
     } finally {
       setLoading(false)
@@ -89,7 +189,7 @@ export default function Home() {
       setTeamSession(data)
     }
 
-    setState("round1")
+    setState("round1Password")
   }
 
   const handleRound1Complete = async (
@@ -123,7 +223,7 @@ export default function Home() {
         })
         .eq("team_name", teamName)
 
-      setState("round2")
+      setState("round2Password")
     } catch (err) {
       console.error("Error completing round 1:", err)
       alert("Error saving submission. Please try again.")
@@ -149,7 +249,7 @@ export default function Home() {
         })
         .eq("team_name", teamName)
 
-      setState("round3")
+      setState("round3Password")
     } catch (err) {
       console.error("Error completing round 2:", err)
       alert("Error saving submission. Please try again.")
@@ -207,11 +307,32 @@ export default function Home() {
   return (
     <>
       {state === "teamName" && <TeamNameInput onTeamEnter={handleTeamEnter} />}
+      {state === "round1Password" && (
+        <RoundPasswordScreen
+          round={1}
+          teamName={teamName}
+          onPasswordCorrect={() => setState("round1")}
+        />
+      )}
       {state === "round1" && (
         <Round1 teamName={teamName} onComplete={handleRound1Complete} />
       )}
+      {state === "round2Password" && (
+        <RoundPasswordScreen
+          round={2}
+          teamName={teamName}
+          onPasswordCorrect={() => setState("round2")}
+        />
+      )}
       {state === "round2" && (
         <Round2 teamName={teamName} onComplete={handleRound2Complete} />
+      )}
+      {state === "round3Password" && (
+        <RoundPasswordScreen
+          round={3}
+          teamName={teamName}
+          onPasswordCorrect={() => setState("round3")}
+        />
       )}
       {state === "round3" && (
         <Round3 teamName={teamName} onComplete={handleRound3Complete} />
@@ -220,9 +341,9 @@ export default function Home() {
         <div className="min-h-screen bg-gradient-to-br from-purple-600 to-pink-600 p-4 flex items-center justify-center">
           <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
             <div className="text-6xl mb-4">🎉</div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">All Done!</h1>
+            <h1 className="text-3xl font-bold text-purple-600 mb-4">Thank You!</h1>
             <p className="text-gray-700 mb-6">
-              Thank you for participating in Sanklap Event, {teamName}!
+              Thank you for participating in Sanklap event, {teamName}!
             </p>
             <p className="text-gray-600">
               Your submissions have been recorded. We will be in touch soon with
