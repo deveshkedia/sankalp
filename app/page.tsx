@@ -8,7 +8,15 @@ import { Round2 } from "@/components/Round2"
 import { Round3 } from "@/components/Round3"
 import { Lock } from "lucide-react"
 
-type AppState = "teamName" | "round1Password" | "round1" | "round2Password" | "round2" | "round3Password" | "round3" | "complete"
+type AppState =
+  | "teamName"
+  | "round1Password"
+  | "round1"
+  | "round2Password"
+  | "round2"
+  | "round3Password"
+  | "round3"
+  | "complete"
 
 // Round Password Screen Component
 interface RoundPasswordScreenProps {
@@ -17,7 +25,11 @@ interface RoundPasswordScreenProps {
   onPasswordCorrect: () => void
 }
 
-function RoundPasswordScreen({ round, teamName, onPasswordCorrect }: RoundPasswordScreenProps) {
+function RoundPasswordScreen({
+  round,
+  teamName,
+  onPasswordCorrect,
+}: RoundPasswordScreenProps) {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [submitting, setSubmitting] = useState(false)
@@ -63,7 +75,9 @@ function RoundPasswordScreen({ round, teamName, onPasswordCorrect }: RoundPasswo
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${colors[round]} p-4 flex items-center justify-center`}>
+    <div
+      className={`min-h-screen bg-gradient-to-br ${colors[round]} p-4 flex items-center justify-center`}
+    >
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
         <div className="text-center mb-8">
           <Lock className={`w-12 h-12 ${titleColors[round]} mx-auto mb-4`} />
@@ -341,9 +355,11 @@ export default function Home() {
         <div className="min-h-screen bg-gradient-to-br from-purple-600 to-pink-600 p-4 flex items-center justify-center">
           <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
             <div className="text-6xl mb-4">🎉</div>
-            <h1 className="text-3xl font-bold text-purple-600 mb-4">Thank You!</h1>
+            <h1 className="text-3xl font-bold text-purple-600 mb-4">
+              Thank You!
+            </h1>
             <p className="text-gray-700 mb-6">
-              Thank you for participating in Sanklap event, {teamName}!
+              Thank you for participating in Adrenaline event, {teamName}!
             </p>
             <p className="text-gray-600">
               Your submissions have been recorded. We will be in touch soon with

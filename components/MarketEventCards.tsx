@@ -7,12 +7,23 @@ interface MarketEventCardsProps {
   onContinue: () => void
 }
 
-export function MarketEventCards({ choice, onContinue }: MarketEventCardsProps) {
-  const events: Record<string, Array<{ title: string; description: string; impact: "positive" | "negative" | "neutral" }>> = {
+export function MarketEventCards({
+  choice,
+  onContinue,
+}: MarketEventCardsProps) {
+  const events: Record<
+    string,
+    Array<{
+      title: string
+      description: string
+      impact: "positive" | "negative" | "neutral"
+    }>
+  > = {
     A: [
       {
         title: "Market Expansion",
-        description: "Your choice attracted 50% more customer interest in the first month.",
+        description:
+          "Your choice attracted 50% more customer interest in the first month.",
         impact: "positive",
       },
       {
