@@ -5,10 +5,15 @@ import { supabase } from "@/lib/supabase"
 import { RefreshCw, Download, Home } from "lucide-react"
 import Link from "next/link"
 
+interface Channel {
+  id: string
+  name: string
+}
+
 interface TeamAllocation {
   team_name: string
   allocations: Record<string, number>
-  sector: string
+  sector_name: string
   choice: string
 }
 
@@ -16,17 +21,17 @@ export default function AllocationsView() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [password, setPassword] = useState("")
   const [allocations, setAllocations] = useState<TeamAllocation[]>([])
-  const [channels, setChannels] = useState<string[]>([])
+  const [channels, setChannels] = useState<Channel[]>([])
+  const [sectors, setSectors] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (isAuthenticated) {
-      loadAllocations()
       loadChannels()
+      loadAllocations()
       // Auto-refresh every 5 seconds
       const interval = setInterval(() => {
         loadAllocations()
-        loadChannels()
       }, 5000)
       return () => clearInterval(interval)
     }
@@ -43,9 +48,11 @@ export default function AllocationsView() {
 
   const loadChannels = async () => {
     try {
-      const { data } = await supabase.from("channels").select("name")
-      const channelNames = (data || []).map((c) => c.name).sort()
-      setChannels(channelNames)
+      const { data } = await supabase
+        .from("channels")
+        .select("id, name")
+        .order("name", { ascending: true })
+      setChannels(data || [])
     } catch (err) {
       console.error("Error loading channels:", err)
     }
@@ -54,6 +61,17 @@ export default function AllocationsView() {
   const loadAllocations = async () => {
     setLoading(true)
     try {
+      // Load sectors to map IDs to names
+      const { data: sectorsData } = await supabase
+        .from("sectors")
+        .select("id, name")
+      const sectorMap: Record<string, string> = {}
+      ;(sectorsData || []).forEach((s) => {
+        sectorMap[s.id] = s.name
+      })
+      setSectors(sectorMap)
+
+      // Load team allocations
       const { data } = await supabase
         .from("team_sessions")
         .select("team_name, round3_allocations, round3_sector, round3_choice")
@@ -63,7 +81,7 @@ export default function AllocationsView() {
       const allocs: TeamAllocation[] = (data || []).map((item: any) => ({
         team_name: item.team_name,
         allocations: item.round3_allocations || {},
-        sector: item.round3_sector || "N/A",
+        sector_name: sectorMap[item.round3_sector] || "N/A",
         choice: item.round3_choice || "N/A",
       }))
 
@@ -76,12 +94,17 @@ export default function AllocationsView() {
   }
 
   const downloadCSV = () => {
-    const headers = ["Team Name", "Choice", "Sector", ...channels]
+    const headers = [
+      "Team Name",
+      "Choice",
+      "Sector",
+      ...channels.map((c) => c.name),
+    ]
     const rows = allocations.map((a) => [
       a.team_name,
       a.choice,
-      a.sector,
-      ...channels.map((ch) => a.allocations[ch] || 0),
+      a.sector_name,
+      ...channels.map((ch) => a.allocations[ch.id] || 0),
     ])
 
     const csv = [headers.join(","), ...rows.map((row) => row.join(","))].join(
@@ -155,7 +178,6 @@ export default function AllocationsView() {
           <button
             onClick={() => {
               loadAllocations()
-              loadChannels()
             }}
             disabled={loading}
             className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
@@ -207,10 +229,10 @@ export default function AllocationsView() {
                     </th>
                     {channels.map((channel) => (
                       <th
-                        key={channel}
+                        key={channel.id}
                         className="px-6 py-3 text-center text-sm font-semibold text-gray-900 min-w-max"
                       >
-                        {channel}
+                        {channel.name}
                       </th>
                     ))}
                     <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">
@@ -238,15 +260,15 @@ export default function AllocationsView() {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-700">
-                          {alloc.sector}
+                          {alloc.sector_name}
                         </td>
                         {channels.map((channel) => (
                           <td
-                            key={channel}
+                            key={channel.id}
                             className="px-6 py-4 text-sm text-center text-gray-900"
                           >
                             <span className="inline-block bg-gray-100 text-gray-900 px-2 py-1 rounded font-medium">
-                              {alloc.allocations[channel] || 0}
+                              {alloc.allocations[channel.id] || 0}
                             </span>
                           </td>
                         ))}
