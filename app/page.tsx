@@ -349,7 +349,11 @@ export default function Home() {
         />
       )}
       {state === "round3" && (
-        <Round3 teamName={teamName} onComplete={handleRound3Complete} />
+        <Round3
+          teamName={teamName}
+          initialSectorId={teamSession?.round1_sector || undefined}
+          onComplete={handleRound3Complete}
+        />
       )}
       {state === "complete" && (
         <div className="min-h-screen bg-gradient-to-br from-purple-600 to-pink-600 p-4 flex items-center justify-center">

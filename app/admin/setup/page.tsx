@@ -9,7 +9,9 @@ export default function AdminSetup() {
   const [password, setPassword] = useState("")
   // adminPassword state no longer used (leftover from earlier version)
   // const [adminPassword, setAdminPassword] = useState("")
-  const [sections, setSections] = useState<"sectors" | "channels" | "market-events">("sectors")
+  const [sections, setSections] = useState<
+    "sectors" | "channels" | "market-events"
+  >("sectors")
 
   // typed records
   interface SectorRecord {
@@ -38,7 +40,7 @@ export default function AdminSetup() {
     name: "",
     situation: "",
     constraint: "",
-    password: "",       // password for Round 1
+    password: "", // password for Round 1
     password_round3: "", // optional separate password for Round 3
   })
 
@@ -54,7 +56,6 @@ export default function AdminSetup() {
     description: "",
     impact: "positive",
   })
-
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -111,14 +112,22 @@ export default function AdminSetup() {
       !newSector.constraint ||
       !newSector.password
     ) {
-      alert("Please fill all fields (password for Round 1 is required; Round 3 password can be left blank to reuse the same value)")
+      alert(
+        "Please fill all fields (password for Round 1 is required; Round 3 password can be left blank to reuse the same value)",
+      )
       return
     }
 
     try {
       await supabase.from("sectors").insert([newSector])
       loadSectors()
-      setNewSector({ name: "", situation: "", constraint: "", password: "", password_round3: "" })
+      setNewSector({
+        name: "",
+        situation: "",
+        constraint: "",
+        password: "",
+        password_round3: "",
+      })
       alert("Sector added successfully!")
     } catch (err) {
       console.error("Error adding sector:", err)
@@ -173,7 +182,12 @@ export default function AdminSetup() {
     try {
       await supabase.from("market_events").insert([newEvent])
       loadEvents()
-      setNewEvent({ choice: "A", title: "", description: "", impact: "positive" })
+      setNewEvent({
+        choice: "A",
+        title: "",
+        description: "",
+        impact: "positive",
+      })
       alert("Event added")
     } catch (err) {
       console.error("Error adding event:", err)
@@ -345,7 +359,10 @@ export default function AdminSetup() {
                     type="text"
                     value={newSector.password_round3}
                     onChange={(e) =>
-                      setNewSector({ ...newSector, password_round3: e.target.value })
+                      setNewSector({
+                        ...newSector,
+                        password_round3: e.target.value,
+                      })
                     }
                     placeholder="Separate password for Round 3 (leave empty to use Round 1)"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"

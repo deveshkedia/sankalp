@@ -8,6 +8,7 @@ import { MarketEventCards } from "./MarketEventCards"
 interface Round3Props {
   teamName: string
   onComplete: (sectorId: string, choice: string) => void
+  initialSectorId?: string
 }
 
 interface Channel {
@@ -31,7 +32,7 @@ type Round3Stage =
   | "marketEvent"
   | "complete"
 
-export function Round3({ teamName, onComplete }: Round3Props) {
+export function Round3({ teamName, onComplete, initialSectorId }: Round3Props) {
   const [stage, setStage] = useState<Round3Stage>("allocation")
   const [channels, setChannels] = useState<Channel[]>([])
   const [sectors, setSectors] = useState<Sector[]>([])
@@ -47,12 +48,25 @@ export function Round3({ teamName, onComplete }: Round3Props) {
     loadData()
   }, [])
 
+  // if we have an initialSectorId (from round1) and the sectors have been loaded,
+  // pre-select it so user doesn't need to click again.
+  useEffect(() => {
+    if (initialSectorId && sectors.length > 0) {
+      const found = sectors.find((s) => s.id === initialSectorId)
+      if (found) {
+        setSelectedSector(found)
+      }
+    }
+  }, [initialSectorId, sectors])
+
   const loadData = async () => {
     try {
       const [{ data: channelsData }, { data: sectorsData }] = await Promise.all(
         [
           supabase.from("channels").select("*"),
-          supabase.from("sectors").select("id,name,situation,constraint,password,password_round3"),
+          supabase
+            .from("sectors")
+            .select("id,name,situation,constraint,password,password_round3"),
         ],
       )
 

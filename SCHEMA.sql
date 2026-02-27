@@ -2,10 +2,10 @@
 -- Copy and paste all of this into Supabase SQL Editor and run
 
 -- ============================================
--- CREATE TABLES
+-- CREATE TABLES (safe to re-run)
 -- ============================================
 
-CREATE TABLE sectors (
+CREATE TABLE IF NOT EXISTS sectors (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   situation TEXT NOT NULL,
@@ -15,13 +15,16 @@ CREATE TABLE sectors (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE channels (
+-- if file is rerun on an existing database ensure new columns exist
+ALTER TABLE sectors ADD COLUMN IF NOT EXISTS password_round3 TEXT;
+
+CREATE TABLE IF NOT EXISTS channels (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE team_sessions (
+CREATE TABLE IF NOT EXISTS team_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   team_name TEXT UNIQUE NOT NULL,
   current_round INTEGER DEFAULT 1,
@@ -35,7 +38,7 @@ CREATE TABLE team_sessions (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE submissions (
+CREATE TABLE IF NOT EXISTS submissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   team_name TEXT NOT NULL,
   round INTEGER NOT NULL,
@@ -46,11 +49,46 @@ CREATE TABLE submissions (
 -- ============================================
 -- CREATE INDEXES (for better performance)
 -- ============================================
+-- wrap the index creation in a DO block so rerunning the file doesn't
+-- fail when the index already exists (Supabase will stop at the first error).
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE c.relname = 'idx_team_sessions_team_name'
+  ) THEN
+    CREATE INDEX idx_team_sessions_team_name ON team_sessions(team_name);
+  END IF;
 
-CREATE INDEX idx_team_sessions_team_name ON team_sessions(team_name);
-CREATE INDEX idx_submissions_team_name ON submissions(team_name);
-CREATE INDEX idx_submissions_round ON submissions(round);
-CREATE INDEX idx_submissions_created ON submissions(created_at);
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE c.relname = 'idx_submissions_team_name'
+  ) THEN
+    CREATE INDEX idx_submissions_team_name ON submissions(team_name);
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE c.relname = 'idx_submissions_round'
+  ) THEN
+    CREATE INDEX idx_submissions_round ON submissions(round);
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE c.relname = 'idx_submissions_created'
+  ) THEN
+    CREATE INDEX idx_submissions_created ON submissions(created_at);
+  END IF;
+END$$;
 
 -- ============================================
 -- EXAMPLE DATA (optional - for testing)
@@ -69,29 +107,26 @@ INSERT INTO sectors (name, situation, "constraint", password, password_round3) V
 ('SaaS', 'Your B2B SaaS tool improves workplace productivity. Acquire enterprise customers in a competitive landscape.', 'Budget: $900K, Timeline: 12 months, Sales cycle long', 'saas606', 'saas606'),
 ('Mobility', 'Your EV charging network solution addresses range anxiety. Scale infrastructure rapidly.', 'Budget: $3M, Timeline: 24 months, Capital intensive', 'mobility707', 'mobility707');
 
--- Sample channels for Round 3
-INSERT INTO channels (name) VALUES
+-- Sample channels for Round 3 (insert only if table empty)
+INSERT INTO channels (name)
+SELECT x FROM (VALUES
 ('Social Media'),
 ('Email Marketing'),
 ('Content Marketing'),
 ('Partnerships'),
-('Paid Advertising');
-
--- Sample market event cards (one per choice)
-INSERT INTO market_events (choice, title, description, impact) VALUES
-('A', 'Market Expansion', 'Your choice attracted 50% more customer interest in the first month.', 'positive'),
-('A', 'Partnership Opportunity', 'A key industry player approached you for collaboration.', 'positive'),
-('B', 'Competitive Pressure', 'A major competitor launched a similar offering.', 'negative'),
-('B', 'Regulatory Compliance', 'You faced unexpected regulatory requirements.', 'neutral'),
-('C', 'Customer Satisfaction', 'Your approach resulted in 40% higher customer retention.', 'positive'),
-('C', 'Operational Challenge', 'Scaling required significant infrastructure investment.', 'negative');
-
+('Paid Advertising')
+) AS t(x)
+WHERE NOT EXISTS (SELECT 1 FROM channels);
 
 -- ============================================
--- Additional table for market events
+-- Additional table for market events (idempotent)
 -- ============================================
 
-CREATE TABLE market_events (
+-- ============================================
+-- Additional table for market events (idempotent)
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS market_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   choice TEXT NOT NULL,
   title TEXT NOT NULL,
@@ -99,6 +134,18 @@ CREATE TABLE market_events (
   impact TEXT NOT NULL CHECK (impact IN ('positive','negative','neutral')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Sample market event cards (insert only if table empty)
+INSERT INTO market_events (choice, title, description, impact)
+SELECT * FROM (VALUES
+('A', 'Market Expansion', 'Your choice attracted 50% more customer interest in the first month.', 'positive'),
+('A', 'Partnership Opportunity', 'A key industry player approached you for collaboration.', 'positive'),
+('B', 'Competitive Pressure', 'A major competitor launched a similar offering.', 'negative'),
+('B', 'Regulatory Compliance', 'You faced unexpected regulatory requirements.', 'neutral'),
+('C', 'Customer Satisfaction', 'Your approach resulted in 40% higher customer retention.', 'positive'),
+('C', 'Operational Challenge', 'Scaling required significant infrastructure investment.', 'negative')
+) AS t(choice,title,description,impact)
+WHERE NOT EXISTS (SELECT 1 FROM market_events);
 
 -- ============================================
 -- NOTES
