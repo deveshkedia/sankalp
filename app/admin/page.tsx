@@ -1,12 +1,12 @@
 "use client"
 
 import Link from "next/link"
-import { Settings, BarChart3, Home, Coins } from "lucide-react"
+import { Settings, BarChart3, Home, Coins, Zap } from "lucide-react"
 
 export default function AdminHome() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-white mb-2">
             AD-RENALINE Admin
@@ -53,6 +53,21 @@ export default function AdminHome() {
                 Terra Coins
               </h2>
               <p className="text-gray-600">View team coin allocations</p>
+            </div>
+          </Link>
+
+          {/* Market Events */}
+          <Link href="/admin/market-events">
+            <div className="bg-white rounded-lg shadow-lg p-8 cursor-pointer hover:shadow-xl transition transform hover:-translate-y-1">
+              <div className="mb-4">
+                <Zap className="w-12 h-12 text-yellow-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Market Events
+              </h2>
+              <p className="text-gray-600">
+                Manage A, B, C events for each sector
+              </p>
             </div>
           </Link>
         </div>
