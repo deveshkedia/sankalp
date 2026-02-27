@@ -35,9 +35,9 @@ function RoundPasswordScreen({
   const [submitting, setSubmitting] = useState(false)
 
   const roundPasswords: Record<1 | 2 | 3, string> = {
-    1: "round1pass",
-    2: "round2pass",
-    3: "round3pass",
+    1: "^&9W9Aq$V4",
+    2: "Lt5TcJi^@h",
+    3: "NcM7dCZG##",
   }
 
   const correctPassword = roundPasswords[round]

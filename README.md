@@ -139,6 +139,10 @@ Visit `http://localhost:3000` in your browser.
    - **Constraint**: Limitations teams must work within
    - **Password**: Secret code for teams to unlock this sector
 3. Add all 5 channels for Round 3 allocation
+
+> Tip: when adding sectors you may now supply an **optional second password** used during the Round 3 sector unlock. Leave it blank to reuse the Round 1 password.
+
+> You can also configure **market event cards** (A/B/C outcomes) under the new "Market Events" tab in the setup panel.
 4. Share event link with teams
 5. Monitor progress in Admin Dashboard (`/admin/dashboard`)
 6. Export submissions as CSV anytime

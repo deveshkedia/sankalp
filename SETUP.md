@@ -214,7 +214,8 @@ if (password === 'admin123') {  // Change this to your password
 ├─────────────────────────────────────┤
 │ 1. Enter Team Name                  │
 │ 2. Select Sector (1 of 10)          │
-│ 3. Enter Sector Password            │
+│ 3. Enter Sector Password (Round 1)  │
+│ 3a. Optionally provide a separate Round 3 password │
 │ 4. Read Situation & Constraint      │
 │ 5. Enter Company Name               │
 │ 6. Submit → Move to Round 2         │
@@ -232,6 +233,8 @@ if (password === 'admin123') {  // Change this to your password
 ├─────────────────────────────────────┤
 │ 1. Allocate 100 Terra Coins         │
 │    across 5 Channels (auto-saves)   │
+│ 1a. NOTE: admins can configure market events     │
+│     for choices A/B/C via the setup panel        │
 │ 2. Select Sector                    │
 │ 3. Choose A, B, or C (FINAL)        │
 │ 4. Submit → Event Complete          │

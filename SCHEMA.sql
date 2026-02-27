@@ -10,7 +10,8 @@ CREATE TABLE sectors (
   name TEXT NOT NULL,
   situation TEXT NOT NULL,
   "constraint" TEXT NOT NULL,
-  password TEXT NOT NULL,
+  password TEXT NOT NULL,                -- used for Round 1
+  password_round3 TEXT,                  -- optional separate password for Round 3
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -56,17 +57,17 @@ CREATE INDEX idx_submissions_created ON submissions(created_at);
 -- ============================================
 
 -- Sample sectors
-INSERT INTO sectors (name, situation, "constraint", password) VALUES
-('Healthcare', 'Your startup develops AI-powered diagnosis tools. You need to enter the Indian market where regulations are complex and trust is paramount.', 'Budget: $500K, Timeline: 6 months, Limited team resources', 'health123'),
-('Finance', 'You built a fintech platform for microfinance. How will you compete with established players and gain customer trust?', 'Budget: $1M, Timeline: 9 months, Compliance challenges', 'finance456'),
-('E-Commerce', 'Your marketplace connects local artisans with global buyers. Scale your platform while maintaining quality.', 'Budget: $300K, Timeline: 6 months, Logistics complexity', 'ecomm789'),
-('EdTech', 'You created an online learning platform. How will you acquire students in a saturated market?', 'Budget: $800K, Timeline: 12 months, Quality assurance required', 'edtech101'),
-('Energy', 'Your renewable energy startup wants to maximize impact. How will you scale operations sustainably?', 'Budget: $2M, Timeline: 18 months, Infrastructure needs', 'energy202'),
-('AgriTech', 'You developed precision farming tools. How will you reach and convince rural farmers?', 'Budget: $400K, Timeline: 8 months, Infrastructure barriers', 'agri303'),
-('Logistics', 'Your last-mile delivery platform disrupts traditional supply chains. Win the market.', 'Budget: $1.5M, Timeline: 12 months, Competition intense', 'logistics404'),
-('IoT', 'You built smart home devices. Enter the market and scale manufacturingcapabilities.', 'Budget: $1.2M, Timeline: 10 months, Supply chain risks', 'iot505'),
-('SaaS', 'Your B2B SaaS tool improves workplace productivity. Acquire enterprise customers in a competitive landscape.', 'Budget: $900K, Timeline: 12 months, Sales cycle long', 'saas606'),
-('Mobility', 'Your EV charging network solution addresses range anxiety. Scale infrastructure rapidly.', 'Budget: $3M, Timeline: 24 months, Capital intensive', 'mobility707');
+INSERT INTO sectors (name, situation, "constraint", password, password_round3) VALUES
+('Healthcare', 'Your startup develops AI-powered diagnosis tools. You need to enter the Indian market where regulations are complex and trust is paramount.', 'Budget: $500K, Timeline: 6 months, Limited team resources', 'health123', 'health123'),
+('Finance', 'You built a fintech platform for microfinance. How will you compete with established players and gain customer trust?', 'Budget: $1M, Timeline: 9 months, Compliance challenges', 'finance456', 'finance456'),
+('E-Commerce', 'Your marketplace connects local artisans with global buyers. Scale your platform while maintaining quality.', 'Budget: $300K, Timeline: 6 months, Logistics complexity', 'ecomm789', 'ecomm789'),
+('EdTech', 'You created an online learning platform. How will you acquire students in a saturated market?', 'Budget: $800K, Timeline: 12 months, Quality assurance required', 'edtech101', 'edtech101'),
+('Energy', 'Your renewable energy startup wants to maximize impact. How will you scale operations sustainably?', 'Budget: $2M, Timeline: 18 months, Infrastructure needs', 'energy202', 'energy202'),
+('AgriTech', 'You developed precision farming tools. How will you reach and convince rural farmers?', 'Budget: $400K, Timeline: 8 months, Infrastructure barriers', 'agri303', 'agri303'),
+('Logistics', 'Your last-mile delivery platform disrupts traditional supply chains. Win the market.', 'Budget: $1.5M, Timeline: 12 months, Competition intense', 'logistics404', 'logistics404'),
+('IoT', 'You built smart home devices. Enter the market and scale manufacturingcapabilities.', 'Budget: $1.2M, Timeline: 10 months, Supply chain risks', 'iot505', 'iot505'),
+('SaaS', 'Your B2B SaaS tool improves workplace productivity. Acquire enterprise customers in a competitive landscape.', 'Budget: $900K, Timeline: 12 months, Sales cycle long', 'saas606', 'saas606'),
+('Mobility', 'Your EV charging network solution addresses range anxiety. Scale infrastructure rapidly.', 'Budget: $3M, Timeline: 24 months, Capital intensive', 'mobility707', 'mobility707');
 
 -- Sample channels for Round 3
 INSERT INTO channels (name) VALUES
@@ -75,6 +76,29 @@ INSERT INTO channels (name) VALUES
 ('Content Marketing'),
 ('Partnerships'),
 ('Paid Advertising');
+
+-- Sample market event cards (one per choice)
+INSERT INTO market_events (choice, title, description, impact) VALUES
+('A', 'Market Expansion', 'Your choice attracted 50% more customer interest in the first month.', 'positive'),
+('A', 'Partnership Opportunity', 'A key industry player approached you for collaboration.', 'positive'),
+('B', 'Competitive Pressure', 'A major competitor launched a similar offering.', 'negative'),
+('B', 'Regulatory Compliance', 'You faced unexpected regulatory requirements.', 'neutral'),
+('C', 'Customer Satisfaction', 'Your approach resulted in 40% higher customer retention.', 'positive'),
+('C', 'Operational Challenge', 'Scaling required significant infrastructure investment.', 'negative');
+
+
+-- ============================================
+-- Additional table for market events
+-- ============================================
+
+CREATE TABLE market_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  choice TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  impact TEXT NOT NULL CHECK (impact IN ('positive','negative','neutral')),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- ============================================
 -- NOTES

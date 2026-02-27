@@ -1,6 +1,8 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react"
+import { supabase } from "@/lib/supabase"
 
 interface MarketEventCardsProps {
   choice: string
@@ -11,54 +13,29 @@ export function MarketEventCards({
   choice,
   onContinue,
 }: MarketEventCardsProps) {
-  const events: Record<
-    string,
-    Array<{
-      title: string
-      description: string
-      impact: "positive" | "negative" | "neutral"
-    }>
-  > = {
-    A: [
-      {
-        title: "Market Expansion",
-        description:
-          "Your choice attracted 50% more customer interest in the first month.",
-        impact: "positive",
-      },
-      {
-        title: "Partnership Opportunity",
-        description: "A key industry player approached you for collaboration.",
-        impact: "positive",
-      },
-    ],
-    B: [
-      {
-        title: "Competitive Pressure",
-        description: "A major competitor launched a similar offering.",
-        impact: "negative",
-      },
-      {
-        title: "Regulatory Compliance",
-        description: "You faced unexpected regulatory requirements.",
-        impact: "neutral",
-      },
-    ],
-    C: [
-      {
-        title: "Customer Satisfaction",
-        description: "Your approach resulted in 40% higher customer retention.",
-        impact: "positive",
-      },
-      {
-        title: "Operational Challenge",
-        description: "Scaling required significant infrastructure investment.",
-        impact: "negative",
-      },
-    ],
+  interface Event {
+    id?: string
+    title: string
+    description: string
+    impact: "positive" | "negative" | "neutral"
   }
 
-  const selectedEvents = events[choice] || []
+  const [selectedEvents, setSelectedEvents] = useState<Event[]>([])
+
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        const { data } = await supabase
+          .from("market_events")
+          .select("*")
+          .eq("choice", choice)
+        setSelectedEvents((data as Event[]) || [])
+      } catch (err) {
+        console.error("Error loading market events:", err)
+      }
+    }
+    loadEvents()
+  }, [choice])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-600 p-4 flex items-center justify-center">
@@ -74,56 +51,62 @@ export function MarketEventCards({
           </div>
 
           <div className="space-y-4 mb-8">
-            {selectedEvents.map((event, index) => (
-              <div
-                key={index}
-                className={`rounded-lg p-6 border-l-4 ${
-                  event.impact === "positive"
-                    ? "bg-green-50 border-green-600"
-                    : event.impact === "negative"
-                      ? "bg-red-50 border-red-600"
-                      : "bg-blue-50 border-blue-600"
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <div>
-                    {event.impact === "positive" && (
-                      <TrendingUp className="w-6 h-6 text-green-600 mt-1" />
-                    )}
-                    {event.impact === "negative" && (
-                      <TrendingDown className="w-6 h-6 text-red-600 mt-1" />
-                    )}
-                    {event.impact === "neutral" && (
-                      <AlertCircle className="w-6 h-6 text-blue-600 mt-1" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h3
-                      className={`font-bold mb-1 ${
-                        event.impact === "positive"
-                          ? "text-green-900"
-                          : event.impact === "negative"
-                            ? "text-red-900"
-                            : "text-blue-900"
-                      }`}
-                    >
-                      {event.title}
-                    </h3>
-                    <p
-                      className={
-                        event.impact === "positive"
-                          ? "text-green-700"
-                          : event.impact === "negative"
-                            ? "text-red-700"
-                            : "text-blue-700"
-                      }
-                    >
-                      {event.description}
-                    </p>
+            {selectedEvents.length === 0 ? (
+              <p className="text-gray-500 text-center">
+                No market events configured for choice {choice}.
+              </p>
+            ) : (
+              selectedEvents.map((event: Event, index: number) => (
+                <div
+                  key={index}
+                  className={`rounded-lg p-6 border-l-4 ${
+                    event.impact === "positive"
+                      ? "bg-green-50 border-green-600"
+                      : event.impact === "negative"
+                        ? "bg-red-50 border-red-600"
+                        : "bg-blue-50 border-blue-600"
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div>
+                      {event.impact === "positive" && (
+                        <TrendingUp className="w-6 h-6 text-green-600 mt-1" />
+                      )}
+                      {event.impact === "negative" && (
+                        <TrendingDown className="w-6 h-6 text-red-600 mt-1" />
+                      )}
+                      {event.impact === "neutral" && (
+                        <AlertCircle className="w-6 h-6 text-blue-600 mt-1" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h3
+                        className={`font-bold mb-1 ${
+                          event.impact === "positive"
+                            ? "text-green-900"
+                            : event.impact === "negative"
+                              ? "text-red-900"
+                              : "text-blue-900"
+                        }`}
+                      >
+                        {event.title}
+                      </h3>
+                      <p
+                        className={
+                          event.impact === "positive"
+                            ? "text-green-700"
+                            : event.impact === "negative"
+                              ? "text-red-700"
+                              : "text-blue-700"
+                        }
+                      >
+                        {event.description}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           <button

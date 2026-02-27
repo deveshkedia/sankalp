@@ -158,7 +158,7 @@ export function Round1({ teamName, onComplete }: Round1Props) {
           {!passwordCorrect ? (
             <form onSubmit={handlePasswordSubmit} className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Enter Sector Password
+                Enter Sector Password (Round 1)
               </label>
               <div className="flex gap-2">
                 <input

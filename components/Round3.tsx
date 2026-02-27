@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
-import { Lock, Check } from "lucide-react"
+import { Check } from "lucide-react"
 import { MarketEventCards } from "./MarketEventCards"
 
 interface Round3Props {
@@ -21,6 +21,7 @@ interface Sector {
   situation: string
   constraint: string
   password: string
+  password_round3?: string
 }
 
 type Round3Stage =
@@ -37,7 +38,6 @@ export function Round3({ teamName, onComplete }: Round3Props) {
   const [allocations, setAllocations] = useState<Record<string, number>>({})
   const [selectedSector, setSelectedSector] = useState<Sector | null>(null)
   const [passwordInput, setPasswordInput] = useState("")
-  const [passwordError, setPasswordError] = useState("")
   const [passwordAttempted, setPasswordAttempted] = useState(false)
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -52,7 +52,7 @@ export function Round3({ teamName, onComplete }: Round3Props) {
       const [{ data: channelsData }, { data: sectorsData }] = await Promise.all(
         [
           supabase.from("channels").select("*"),
-          supabase.from("sectors").select("*"),
+          supabase.from("sectors").select("id,name,situation,constraint,password,password_round3"),
         ],
       )
 
@@ -98,7 +98,9 @@ export function Round3({ teamName, onComplete }: Round3Props) {
   }
 
   const passwordCorrect =
-    passwordAttempted && passwordInput === selectedSector?.password
+    passwordAttempted &&
+    passwordInput ===
+      (selectedSector?.password_round3 || selectedSector?.password)
 
   if (loading) {
     return (
@@ -255,7 +257,7 @@ export function Round3({ teamName, onComplete }: Round3Props) {
                     type="password"
                     value={passwordInput}
                     onChange={(e) => setPasswordInput(e.target.value)}
-                    placeholder="Enter password"
+                    placeholder="Enter round‑3 password"
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
                   />
                   <button

@@ -243,9 +243,9 @@ export default function AllocationsView() {
                         {channels.map((channel) => (
                           <td
                             key={channel}
-                            className="px-6 py-4 text-sm text-center text-gray-700"
+                            className="px-6 py-4 text-sm text-center text-gray-900"
                           >
-                            <span className="inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded font-medium">
+                            <span className="inline-block bg-gray-100 text-gray-900 px-2 py-1 rounded font-medium">
                               {alloc.allocations[channel] || 0}
                             </span>
                           </td>
