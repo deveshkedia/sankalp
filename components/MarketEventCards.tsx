@@ -6,11 +6,13 @@ import { supabase } from "@/lib/supabase"
 
 interface MarketEventCardsProps {
   choice: string
+  sectorId: string
   onContinue: () => void
 }
 
 export function MarketEventCards({
   choice,
+  sectorId,
   onContinue,
 }: MarketEventCardsProps) {
   interface Event {
@@ -28,6 +30,7 @@ export function MarketEventCards({
         const { data } = await supabase
           .from("market_events")
           .select("*")
+          .eq("sector_id", sectorId)
           .eq("choice", choice)
         setSelectedEvents((data as Event[]) || [])
       } catch (err) {
@@ -35,7 +38,7 @@ export function MarketEventCards({
       }
     }
     loadEvents()
-  }, [choice])
+  }, [choice, sectorId])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-600 p-4 flex items-center justify-center">
@@ -53,7 +56,7 @@ export function MarketEventCards({
           <div className="space-y-4 mb-8">
             {selectedEvents.length === 0 ? (
               <p className="text-gray-500 text-center">
-                No market events configured for choice {choice}.
+                No market events configured for this choice and sector.
               </p>
             ) : (
               selectedEvents.map((event: Event, index: number) => (

@@ -403,6 +403,7 @@ export function Round3({ teamName, onComplete, initialSectorId }: Round3Props) {
     return (
       <MarketEventCards
         choice={selectedChoice}
+        sectorId={selectedSector!.id}
         onContinue={async () => {
           setSubmitting(true)
           try {

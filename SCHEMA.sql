@@ -28,7 +28,6 @@ CREATE TABLE IF NOT EXISTS team_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   team_name TEXT UNIQUE NOT NULL,
   current_round INTEGER DEFAULT 1,
-  round1_sector UUID,
   round1_company TEXT,
   round2_image_link TEXT,
   round3_allocations JSONB,
@@ -41,8 +40,6 @@ CREATE TABLE IF NOT EXISTS team_sessions (
 CREATE TABLE IF NOT EXISTS submissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   team_name TEXT NOT NULL,
-  round INTEGER NOT NULL,
-  data JSONB NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -62,6 +59,7 @@ BEGIN
     CREATE INDEX idx_team_sessions_team_name ON team_sessions(team_name);
   END IF;
 
+
   IF NOT EXISTS (
     SELECT 1
     FROM pg_class c
@@ -70,6 +68,7 @@ BEGIN
   ) THEN
     CREATE INDEX idx_submissions_team_name ON submissions(team_name);
   END IF;
+
 
   IF NOT EXISTS (
     SELECT 1
@@ -135,17 +134,169 @@ CREATE TABLE IF NOT EXISTS market_events (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Sample market event cards (insert only if table empty)
-INSERT INTO market_events (choice, title, description, impact)
-SELECT * FROM (VALUES
-('A', 'Market Expansion', 'Your choice attracted 50% more customer interest in the first month.', 'positive'),
-('A', 'Partnership Opportunity', 'A key industry player approached you for collaboration.', 'positive'),
-('B', 'Competitive Pressure', 'A major competitor launched a similar offering.', 'negative'),
-('B', 'Regulatory Compliance', 'You faced unexpected regulatory requirements.', 'neutral'),
-('C', 'Customer Satisfaction', 'Your approach resulted in 40% higher customer retention.', 'positive'),
-('C', 'Operational Challenge', 'Scaling required significant infrastructure investment.', 'negative')
-) AS t(choice,title,description,impact)
-WHERE NOT EXISTS (SELECT 1 FROM market_events);
+-- Ensure market events reference sectors (one A/B/C event per sector)
+ALTER TABLE market_events ADD COLUMN IF NOT EXISTS sector_id UUID REFERENCES sectors(id) ON DELETE CASCADE;
+
+-- Insert A, B, C market events for each sector
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'A' as choice, 'Regulatory Approval Breakthrough', 'Your aggressive approach to regulatory compliance paid off. Indian health authorities fast-tracked your certification, giving you first-mover advantage.', 'positive'
+FROM sectors s WHERE s.name = 'Healthcare'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'B' as choice, 'Gradual Market Adoption', 'Your conservative, trusted approach resonated with healthcare providers. You achieved steady inroads with 15% market penetration.', 'positive'
+FROM sectors s WHERE s.name = 'Healthcare'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'C' as choice, 'Partnership Expansion Delayed', 'Your partnership strategy faced unexpected roadblocks. Negotiations stalled, delaying market entry by 4 months.', 'negative'
+FROM sectors s WHERE s.name = 'Healthcare'
+ON CONFLICT DO NOTHING;
+
+-- Finance Sector
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'A' as choice, 'Digital Revolution Secured', 'Your aggressive growth strategy disrupted traditional finance. Downloaded by 100K users in 3 months.', 'positive'
+FROM sectors s WHERE s.name = 'Finance'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'B' as choice, 'Trust Building Success', 'By focusing on compliance and security, you won over cautious customers. 8% market share in first year.', 'positive'
+FROM sectors s WHERE s.name = 'Finance'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'C' as choice, 'RBI Compliance Issue', 'Your partnership strategy revealed regulatory gaps. RBI imposed temporary restrictions on your platform.', 'negative'
+FROM sectors s WHERE s.name = 'Finance'
+ON CONFLICT DO NOTHING;
+
+-- E-Commerce Sector
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'A' as choice, 'Scale Success Achieved', 'Your aggressive expansion led to 50K artisans on platform. Revenue exceeded projections by 40%.', 'positive'
+FROM sectors s WHERE s.name = 'E-Commerce'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'B' as choice, 'Quality Consistency Praised', 'Your focus on quality control earned premium customer loyalty. NPS score of 72, highest in category.', 'positive'
+FROM sectors s WHERE s.name = 'E-Commerce'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'C' as choice, 'Logistics Partnership Collapses', 'Your primary logistics partner defaulted, affecting 20% of orders. Customer satisfaction dropped 25%.', 'negative'
+FROM sectors s WHERE s.name = 'E-Commerce'
+ON CONFLICT DO NOTHING;
+
+-- EdTech Sector
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'A' as choice, 'Market Dominance', 'Your aggressive marketing captured 12% of online learning market. Competitors lost share to your platform.', 'positive'
+FROM sectors s WHERE s.name = 'EdTech'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'B' as choice, 'Quality Excellence Recognition', 'Your rigorous QA process earned government recognition. Eligible for education ministry grants.', 'positive'
+FROM sectors s WHERE s.name = 'EdTech'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'C' as choice, 'Content Provider Disputes', 'Partnership tensions with content creators led to 30% reduction in course offerings.', 'negative'
+FROM sectors s WHERE s.name = 'EdTech'
+ON CONFLICT DO NOTHING;
+
+-- Energy Sector
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'A' as choice, 'Green Energy Boom', 'Your aggressive infrastructure build-out positioned you as energy sector leader. 50MWh capacity installed.', 'positive'
+FROM sectors s WHERE s.name = 'Energy'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'B' as choice, 'Sustainable Growth Validated', 'Conservative approach earned government validation. Awarded multi-year Solar Power contracts.', 'positive'
+FROM sectors s WHERE s.name = 'Energy'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'C' as choice, 'Supply Chain Disruption', 'Partner sourcing issues delayed equipment delivery. Project timelines slipped 6 months.', 'negative'
+FROM sectors s WHERE s.name = 'Energy'
+ON CONFLICT DO NOTHING;
+
+-- AgriTech Sector
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'A' as choice, 'Farmer Adoption Surge', 'Your aggressive outreach reached 5000 farmers. Yield improvements averaged 22%.', 'positive'
+FROM sectors s WHERE s.name = 'AgriTech'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'B' as choice, 'Trust & Credibility Built', 'Slow, methodical approach earned farmer trust. Long-term contracts secured with 500+ farmers.', 'positive'
+FROM sectors s WHERE s.name = 'AgriTech'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'C' as choice, 'Infrastructure Partnership Failed', 'Key irrigation partner withdrew support. Rural distribution network collapsed temporarily.', 'negative'
+FROM sectors s WHERE s.name = 'AgriTech'
+ON CONFLICT DO NOTHING;
+
+-- Logistics Sector
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'A' as choice, 'Market Share Capture', 'Your aggressive pricing and service quality won 18% of last-mile market. Revenue ₹50Cr annually.', 'positive'
+FROM sectors s WHERE s.name = 'Logistics'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'B' as choice, 'Customer Lifetime Value Optimized', 'Your focus on service quality and operations efficiency reduced costs by 20%. Margins improved.', 'positive'
+FROM sectors s WHERE s.name = 'Logistics'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'C' as choice, 'Fleet Partner Bankruptcy', 'Your outsourced fleet partner faced financial crisis. Operational disruptions affected 35% of deliveries.', 'negative'
+FROM sectors s WHERE s.name = 'Logistics'
+ON CONFLICT DO NOTHING;
+
+-- IoT Sector
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'A' as choice, 'Smart Home Revolution', 'Your aggressive manufacturing scaling produced 100K units. Smart homes adoption reached 8% of market.', 'positive'
+FROM sectors s WHERE s.name = 'IoT'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'B' as choice, 'Premium Quality Brand Built', 'Your quality-first approach earned luxury segment acclaim. 40% margin achieved vs 15% competitors.', 'positive'
+FROM sectors s WHERE s.name = 'IoT'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'C' as choice, 'Supply Chain Crisis', 'Critical semiconductor supplier had production issues. Manufacturing capacity reduced by 60% for 2 quarters.', 'negative'
+FROM sectors s WHERE s.name = 'IoT'
+ON CONFLICT DO NOTHING;
+
+-- SaaS Sector
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'A' as choice, 'Enterprise Deals Accelerated', 'Your aggressive sales strategy won 50 enterprise customers. ARR reached ₹10Cr.', 'positive'
+FROM sectors s WHERE s.name = 'SaaS'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'B' as choice, 'Customer Success Excellence', 'Your focus on customer success achieved 95% retention. Net Revenue Retention at 125%.', 'positive'
+FROM sectors s WHERE s.name = 'SaaS'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'C' as choice, 'Partners Demand Renegotiation', 'Channel partner disputes over margins caused 25% loss of distribution revenue.', 'negative'
+FROM sectors s WHERE s.name = 'SaaS'
+ON CONFLICT DO NOTHING;
+
+-- Mobility Sector
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'A' as choice, 'EV Infrastructure Boom', 'Your aggressive expansion installed 500 charging stations across 10 cities. Market leader status achieved.', 'positive'
+FROM sectors s WHERE s.name = 'Mobility'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'B' as choice, 'Profitable Operations Achieved', 'Your focus on optimal site selection and operational efficiency achieved positive unit economics.', 'positive'
+FROM sectors s WHERE s.name = 'Mobility'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO market_events (sector_id, choice, title, description, impact)
+SELECT s.id, 'C' as choice, 'City Authority Conflicts', 'Land acquisition disputes with municipal authorities delayed expansion in 5 cities.', 'negative'
+FROM sectors s WHERE s.name = 'Mobility'
+ON CONFLICT DO NOTHING;
+
 
 -- ============================================
 -- NOTES
